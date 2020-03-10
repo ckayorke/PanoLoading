@@ -1,0 +1,328 @@
+﻿@using PanoLoading.Models
+@model ProjectListViewModel
+@{
+    ViewBag.Title = "Projects";
+}
+<h2>@ViewBag.Title</h2>
+<hr />
+
+    <style>
+   
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            
+            background-color: #112d5d;
+        }
+        .tab button {
+            background-color: #112d5d;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+            margin-right:1px;
+            color:white;
+        }           
+        .tab button:hover {
+            background-color: #ddd;
+        }           
+        .tab button.active {
+            background-color: #555555;
+        }   
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+        .btn:hover{
+         background-color: #112d5d;
+         color: white;
+        }
+
+        #pModal11.w3-modal-content{
+            border-radius: 6px;
+             width:1100px;  
+        }
+
+        #pModal12{
+          width:1100px;         
+        }
+
+        #pModal12.w3-container, #pModal13.w3-container{
+            padding:0px;
+         }
+
+        #pModal13{
+          height:60px;
+        }
+
+        #tourTitle, #tourAddress{
+            display: inline-block;
+            width: inherit;
+            text-align:center;
+        }   
+        #closeer{
+            /*color:white;*/
+        }  
+        
+         
+    </style>
+     <div class="tab">
+        <button  id="tabA"  class="tablinks" onclick="openCity(event, 'OpenProjects')">Open Projects</button>
+        <button  id="tabB"  class="tablinks" onclick="openCity(event, 'ClosedProjects')">Closed Projects</button>        
+    </div>
+    <div id="OpenProjects" class="tabcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>ZIP Code</th>                            
+                            <th>Status</th>
+                            @*<th>Tour</th>*@                          
+                            <th></th>
+                            @if ((Model.AppUser != null) && (Model.AppUser.Permission == 3 || Model.AppUser.Permission == 1))
+                            {
+                                <th></th>
+                                <th></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Projects)
+                        {
+                            if (item.ProjectStatus < 4)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.OutPicUrl.Count > 0)
+                                        {                                           
+                                            <div>                                         
+                                                <img src="@Url.Content(item.OutPicUrl[0])" alt="No Preview" width="100" height="100">
+                                            </div>                                           
+                                        }
+                                 </td>
+                                <td>@item.Address</td>
+                                <td>@item.City</td>
+                                <td>@item.Zip</td>
+                                    <td>@item.StatusName</td>  
+                                @*<td>
+                                    <a href="#" id="tour @item.Id" class="btn btn-default">View Tour</a>                                   
+                                </td>*@                                                              
+                                <td>
+                                    <a href="#" id="@item.Id" class="btn btn-default">View</a>
+                                </td>
+                                @if (Model.AppUser.Permission == 3 || Model.AppUser.Permission == 1)
+                                {
+                                    <td>
+                                        <a href="@item.url" id="@item.Id" class="btn btn-default">Upload Full Plan</a>
+                                    </td>
+                                    <td>
+                                        @if (item.Plan.PlanAdded)
+                                        {
+                                            <a href="@item.Plan.URLToDownload" class="btn btn-default">Download Full Plan</a>
+                                        }
+
+                                    </td>
+                                }
+                            </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>        
+    </div>
+    <div id="ClosedProjects" class="tabcontent">
+        <div class="row">
+            <div class="col-md-12">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Address</th>
+                            <th>City</th>
+                            <th>ZIP Code</th>
+                            <th>Status</th>  
+                            @*<th>Tour </th>*@                                                    
+                            <th></th>
+                            @if ((Model.AppUser != null) && (Model.AppUser.Permission == 3 || Model.AppUser.Permission == 1))
+                            {                                
+                                <th></th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Projects)
+                        {
+                            if (item.ProjectStatus > 3)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (item.OutPicUrl.Count > 0)
+                                        {
+                                            <div>
+                                                <img src="@Url.Content(item.OutPicUrl[0])" alt="No Preview" width="100" height="100">
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>@item.Address</td>
+                                    <td>@item.City</td>
+                                    <td>@item.Zip</td>
+                                    <td>@item.StatusName</td>
+                                    @*<td>
+                                        <a href="#" id="tour @item.Id" class="btn btn-default">View Tour</a>                                       
+                                    </td>*@                                   
+                                    <td>
+                                        <a href="#" id="@item.Id" class="btn btn-default">View</a>
+                                    </td>
+                                    @if (Model.AppUser.Permission == 3 || Model.AppUser.Permission == 1)
+                                    {                                       
+                                        <td>
+                                            @if (item.Plan.PlanAdded)
+                                            {
+                                                <a href="@item.Plan.URLToDownload" class="btn btn-default">Download Full Plan</a>
+                                            }
+
+                                        </td>
+                                    }
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>  
+    </div>
+    <script>        
+        function openCity(evt, projectType) {
+          var i, tabcontent, tablinks;
+          tabcontent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+          }
+          tablinks = document.getElementsByClassName("tablinks");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+          }
+          document.getElementById(projectType).style.display = "block";
+          evt.currentTarget.className += " active";
+        }
+        $("#tabA").click();
+    </script>
+
+  
+    <div id="pModal" class="w3-modal">
+        <div class="w3-modal-content">
+            <header class="w3-container w3-dark-grey">
+                <span onclick="document.getElementById('pModal').style.display = 'none'"
+                      class="w3-button w3-display-topright">&times;</span>
+                <h2>Upload Project Plan</h2>
+            </header>
+            <div class="w3-container">
+                @using (Html.BeginForm("ProjectPlanUploadFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            @Html.TextBox("file", "", new { type = "file", @class = "form-control", accept = "application/pdf" }) <br />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Submit Plan" class="btn btn-default" />
+                        </div>
+                    </div>
+                }
+            </div>
+            <footer class="w3-container w3-dark-grey">
+                <h1></h1>
+            </footer>
+        </div>
+    </div>
+
+<div id="pModal1" class="w3-modal">
+    <div id="pModal11" class="w3-modal-content">
+        <header id="pModal13" class="w3-container">
+            <span id="closeer" onclick="document.getElementById('pModal1').style.display = 'none'" class="w3-button w3-display-topright">&times;</span>
+        </header>
+        <div id="pModal12" class="w3-container">
+        <div>
+            <img src="" id="logo" width="151" height="35" />
+        </div> 
+        <div id="floorPlan">
+        </div>
+        <div id="floorTour">
+            <iframe id="iframeSrc" src=""
+                    width="100%" height="830"
+                    allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+                <p>Your browser does not support iframes.</p>
+            </iframe>
+            @*<iframe id="iframeSrc" width="100%" height="830" style="width: 100%; height: 830px; border: none; max-width: 100%;" frameborder="0" allow="vr,gyroscope,accelerometer,fullscreen" scrolling="no" allowfullscreen="true" src="https://kuula.co/share/collection/7lPKn?fs=1&vr=0&sd=1&thumbs=1&chromeless=0&logo=0"></iframe>*@
+        </div>
+    </div>
+        <footer class="w3-container w3-dark-grey">            
+        </footer>
+    </div>
+</div>
+    
+    <script>
+        $(function() {
+                $("#tabContainer").tabs();
+        });
+        $('a').click(function (e) {
+            var id = e.currentTarget.id;
+            var textInfo = e.currentTarget.innerText;
+            if (textInfo.trim() == "View") {
+                e.preventDefault();
+                window.location.href = "Levels/" + id;
+            }
+
+            if (textInfo.trim() == "Upload Full Plan") {
+                e.preventDefault();
+                var href = e.currentTarget.href;
+                if (id.trim() == "") {
+                    return;
+                }
+                $.getJSON(href, { projectId: id }, function (data) {
+                    document.getElementById('pModal').style.display = 'block';
+                });
+            }
+            if (textInfo.trim() == "Download Full Plan") {
+            }
+
+            if (id.trim().indexOf("tour") != -1) {
+                var loc = id.trim().split(" ");
+                var proId = parseInt(loc[1]);
+                var str1 = window.location.href.split("Home");
+                var href = str1[0] + "Home/GetIFrame";
+                $.getJSON(href, { projectId: proId }, function (data) {
+                    if (data.trim() == "Bad") {
+                        alert("Tour is not yet available");
+                    }
+                    else
+                    {
+                        document.getElementById("iframeSrc").src = data.trim();
+                        var str = window.location.href.split("Home");
+                        var root = str[0] + "UploadedPictureFiles/backup1.png";
+                        document.getElementById("logo").src = root;
+                        document.getElementById("logo").alt = "Logo";
+                        var root1 = str[0] + "UploadedPictureFiles/backup2.jpg";
+                        var urlString = 'url(' + root1 + ')';
+                        document.getElementById('pModal12').style.backgroundImage = urlString;
+                        document.getElementById('pModal12').style.backgroundRepeat = "no-repeat";
+                        document.getElementById('pModal12').style.backgroundSize = "1100px 835px";
+                        document.getElementById('pModal1').style.display = 'block';
+                    }                    
+                });             
+            }
+        });       
+</script>

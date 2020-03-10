@@ -1,0 +1,154 @@
+﻿@using PanoLoading.Models
+@model ModifyProjectViewModel
+@{
+  
+    ViewBag.Title = "Modify Project";
+}
+
+<h2>@ViewBag.Title</h2>
+<hr />
+<div class="row">
+    <div class="col-md-3">
+    </div>
+        <div class="col-md-6">           
+            <section id="loginForm">
+                @using (Html.BeginForm("ModifyProject", "Home", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" , id= "ModifyProject" }))
+                {
+                    @Html.AntiForgeryToken()                   
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })   
+                                   
+                    <div class="form-group" id="stateDiv">
+                        @Html.LabelFor(m => m.ProjectState, new { @class = "col-md-2 control-label" })                       
+                        <div class="col-md-10">                           
+                            @Html.DropDownList("ProjectState", (Model.ProjectStates as List<SelectListItem>), "Select State", new { @class = "form-control", onchange = "LoadCity();" })
+                            @Html.ValidationMessageFor(m => m.ProjectState, "", new { @class = "text-danger" })                       
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="cityDiv">
+                        @Html.LabelFor(m => m.ProjectCity, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("ProjectCity", (Model.ProjectCities as List<SelectListItem>), "Select City", new { @class = "form-control", onchange = "LoadZIPS();" })
+                            @Html.ValidationMessageFor(m => m.ProjectCity, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="ZIPDiv">
+                        @Html.LabelFor(m => m.ProjectZIPCode, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("ProjectZIPCode", (Model.ProjectZIPS as List<SelectListItem>), "Select ZIP Code", new { @class = "form-control", onchange = "LoadAddresses();" })
+                            @Html.ValidationMessageFor(m => m.ProjectZIPCode, "", new { @class = "text-danger", id = "zipMessage" })
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="AddressDiv">
+                        @Html.LabelFor(m => m.ProjectAddress, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("ProjectAddress", (Model.ProjectAddresses as List<SelectListItem>), "Select Address", new { @class = "form-control", onchange = "LoadAppUsers();" })
+                            @Html.ValidationMessageFor(m => m.ProjectAddress, "", new { @class = "text-danger", id="addressMessage"})
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="UsersDiv">
+                        @Html.LabelFor(m => m.Fielder, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("Fielder", (Model.Fielders as List<SelectListItem>), "Select Field Person", new { @class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.Fielder, "", new { @class = "text-danger", id = "fielderMessage" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Submit" class="btn btn-default" />
+                        </div>
+                    </div>                                     
+                }
+            </section>
+        </div>
+        <div class="col-md-3">               
+        </div>
+    
+    </div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+<script>
+    function LoadCity(){
+        var selector = document.getElementById('ProjectState');
+        var value = selector[selector.selectedIndex].text;
+        $.getJSON("../LoadCities", { state: value }, function (data) {
+            var select = $("#ProjectCity");
+            select.empty();
+            select.append($('<option/>', { value: 0, text: "Select City"}));
+            $.each(data, function (index, itemData) {               
+                select.append($('<option/>', {
+                    value: itemData.Value,
+                    text: itemData.Text
+                }));
+                
+            });            
+        });        
+    }
+
+    function LoadZIPS() {
+        var selector1 = document.getElementById('ProjectState');
+        var value1 = selector1[selector1.selectedIndex].text;
+
+        var selector2 = document.getElementById('ProjectCity');
+        var value2 = selector2[selector2.selectedIndex].text;
+
+        $.getJSON("../LoadZIPS", { state:value1, city: value2 }, function (data) {
+            var select = $("#ProjectZIPCode");
+            select.empty();
+            select.append($('<option/>', { value: 0, text: "Select ZIP Code" }));
+            $.each(data, function (index, itemData) {
+                select.append($('<option/>', {
+                    value: itemData.Value,
+                    text: itemData.Text
+                }));
+
+            });
+        });
+    }
+
+  
+    function LoadAddresses() {
+        var selector = document.getElementById('ProjectZIPCode');
+        var value = selector[selector.selectedIndex].text;
+        var selector1 = document.getElementById('ProjectState');
+        var value1 = selector1[selector1.selectedIndex].text;
+
+        var selector2 = document.getElementById('ProjectCity');
+        var value2 = selector2[selector2.selectedIndex].text;
+
+
+        $.getJSON("../LoadAddresses", { state:value1, city: value2, zip: value }, function (data) {
+            var select = $("#ProjectAddress");
+            select.empty();
+            select.append($('<option/>', { value: 0, text: "Select Address" }));
+            $.each(data, function (index, itemData) {
+                select.append($('<option/>', {
+                    value: itemData.Value,
+                    text: itemData.Text
+                }));
+
+            });
+        });
+    }
+
+    function LoadAppUsers() {       
+        $.getJSON("../LoadAppUsers", function (data) {
+            var select = $("#Fielder");
+            select.empty();            
+            $.each(data, function (index, itemData) {
+                select.append($('<option/>', {
+                    value: itemData.Value,
+                    text: itemData.Text
+                }));
+            });
+        });
+    }
+</script>
+

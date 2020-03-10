@@ -1,0 +1,213 @@
+﻿@{
+    string url = Request.Url.ToString();
+    var data = url.Split(new string[] { "Home" }, StringSplitOptions.None);
+    var url2 = data[0];
+    var register = url2 + "Account/Register";
+    var pic0A = url2 + "UploadedPictureFiles/screenpic0A.jpg";
+    var pic0B = url2 + "UploadedPictureFiles/screenpic0B.png";
+
+
+    var pic1A = url2 + "UploadedPictureFiles/screenpic1A.jpg";
+    var pic1B = url2 + "UploadedPictureFiles/screenpic1B.png";
+    var pic2 = url2 + "UploadedPictureFiles/screenpic2.jpg";
+
+    var pic3A = url2 + "UploadedPictureFiles/screenpic3A.jpg";
+    var pic3B = url2 + "UploadedPictureFiles/screenpic3B.png";
+
+    var pic4A = url2 + "UploadedPictureFiles/screenpic4A.jpg";
+    var pic4B = url2 + "UploadedPictureFiles/screenpic4B.png";
+}
+
+
+
+<style>
+    .btn:hover{
+         background-color: #112d5d;
+         color: white;
+        }
+
+        .imgcontainer {
+          text-align: center;
+          margin: 24px 0 12px 0;
+        }
+
+        img.avatar2 {
+          width: 20%;
+          border-radius: 5%;
+        }
+    </style>
+
+
+<h1>AllView360 Mobile App Support</h1>
+<hr />
+<h3>Introduction</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10"> 
+        The AllView360 mobile app can be used by registered users to take measurements and panorama pictures to create virtual tour of  realestate properties that have been assigned to the users. There is no fees for registering and using this app.
+    </div>
+    <div class="col-md-1">               
+     </div>
+</div>
+
+<h3>Registration</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        To use the AllView360 Mobile App, first <span class="reg"><a href="@Url.Content(register)">Register here</a></span>. Once your registration is recieved, you will get an approval notice email within 24 hours with assigned projects.
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<h3>Installation</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        The AllView360 Mobile App is available for both IOS and Android phones. You can get it at google play store and app store connect. Please note that, you have to <span class="reg"><a href="@Url.Content(register)">Register here</a></span> and must get assigned projects before you can use the app.
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<h3>Required Equipment</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        1. Bosch Laser measure Professional GLM 50 C with bluetooth <br />
+        2. Ricoh Theta SC Camera
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<h3>Download/Upload Projects</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        To download assigned projects and to upload completed projects from the AllView360 Mobile App, tap on the download/upload button and following the process.
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic0A)" alt="LOGO" class="avatar2">
+        </div>        
+         After Projects are downloaded, the projects are added into a list as seen in the image below.
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic0B)" alt="LOGO" class="avatar2">
+        </div>   
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<h3>Adding Information To Project</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+         To add information to  a particular project, single tap the project in the list as seen in the image above. Afterwards your screen will now look like the image below
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic1A)" alt="LOGO" class="avatar2">
+        </div>
+        Before you can add any of the levels to your project, you must first take an entrance panorama (360 degrees) photo of the property. To do that, tap on the "Take Entrance Picture" button to go to the next screen.
+       <br />
+       <br />
+        If the Ricoh Theta SC Camera is not already connected, you will see an alert indicating that you should connect your phone to the Camera WIFI and you will be sent back to the project list screen. 
+        <br />
+        Connecting your phone to the Camera WIFI can be done by going to your phone settings and selecting the Theta WIFI
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<h3>Taking 360 Degrees Pictures</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+         When you tap a button to take an entrance picture or room picture, you screen will now look like the image below. When the Ricoh Theta SC Camera is fully connect, the "Capture" button will be active. You can take as many pictures as you want while on are on this screen. When you finish taking all your pictures, single tap the "Done" button and you will be taking back to your previous screen. 
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic2)" alt="LOGO" class="avatar2">
+        </div>
+        
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<h3>Adding Floors To Project</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        After taking an entrance 360 degree picture, you will be brought back to the previous screen where you can add any floors to your project. 
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic1B)" alt="LOGO" class="avatar2">
+        </div>
+        To add a particular floor, single tap the button with the floor name and the item will be added in the list at the top of the screen  as seen in the image above.
+        <br />
+        <br />
+        If you want to delete the level added, tap and hold the level name in the list.
+        <br />
+        <br />
+        If you want to add rooms to a particular level, single tap the level name  in the list to go to the next screen 
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+
+<h3>Adding Rooms To Floors</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        To add a room, tap and hold one of the cells as seen in the image below. This will bring up a popup that will allow you to select the room name. After selecting the room name, the popup will disappear. Now, select the neighboring cells to form the shape of the room. Next, tap the "Save" button to save the room.
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic3A)" alt="LOGO" class="avatar2">
+        </div>
+        To delete the room, take 360 degrees picture of the rooom, or take measurement of the room, double tap the room as seen in the image below to bring up a popup and follow the process.
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic3B)" alt="LOGO" class="avatar2">
+        </div>
+     </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+
+
+<h3>Taking Room Measurements With Bosch Laser measure</h3>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-10">
+        The Bosch Laser measure Professional GLM 50C  works with bluetooth, so first, you must turn on the bluetooth functionality of your phone. This can be done by going to the Phone settings. Once you turn on your phone bluetooth, you must also turn on the Bosch Laser measure Professional GLM 50C, then, press the bluetooth icon on the Bosch Laser measure Professional GLM 50C to start sending out signals. Next, pair your phone to the Bosch Laser measure bluetooth.
+        <br />
+        <br />
+        When you double tap a room and you indicate to take room measurements, your screen will look like the image below if the laser measure is paired, turned on, and sending out signals. Just tap the select buttton next to the laser measure name on the screen.
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic4A)" alt="LOGO" class="avatar2">
+        </div>
+        If your Bosch Laser measure Professional GLM 50C is not turned on, your screen will look like the image below.
+        <div class="imgcontainer">
+            <img src="@Url.Content(pic4B)" alt="LOGO" class="avatar2">
+        </div>
+
+        First, turn the Bosch Laser measure on, then press the bluetooth icon on the Laser measure to start sending out signals. Afterwards, tap the refresh icon at the upper right corner of your phone screen as seen in the image below.
+        The name of the laser measure will show in a list with a select button next to the name of the laser measure. Once you hit the button, the laser measure will connect with the application and you can start measuring. 
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+
+<div>
+    @Html.ActionLink("Back", "Decision", "Home")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

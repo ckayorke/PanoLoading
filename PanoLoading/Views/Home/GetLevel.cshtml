@@ -1,0 +1,443 @@
+﻿@using PanoLoading.Models
+@model RoomViewModel
+@{
+// ViewBag.Title = "Level Detail";
+//List<string> r = new List<string>();
+//foreach(var k in Model.Rooms)
+//{
+//    r.Add(k.Name);
+//}
+//var result = String.Join(", ", r.ToArray());
+
+}
+<h3>@ViewBag.Title</h3>
+<hr />
+<style type="text/css">
+     .btn:hover {
+        background-color: #112d5d;
+        color: white;
+    }
+
+    #levelUrl {
+        display: none;
+    }
+
+    #pdf-main-container {
+        width: 400px;
+        margin: 20px auto;
+    }
+
+    #pdf-loader {
+        display: none;
+        text-align: center;
+        color: #999999;
+        font-size: 13px;
+        line-height: 100px;
+        height: 100px;
+    }
+
+    #pdf-contents {
+        display: none;
+    }
+
+    #pdf-meta {
+        overflow: hidden;
+        margin: 0 0 20px 0;
+    }
+
+    #pdf-buttons {
+        float: left;
+    }
+
+    #page-count-container {
+        float: right;
+    }
+
+    #pdf-current-page {
+        display: inline;
+    }
+
+    #pdf-total-pages {
+        display: inline;
+    }
+
+    #pdf-canvas {
+        border: 1px solid rgba(0,0,0,0.2);
+        box-sizing: border-box;
+    }
+
+    #page-loader {
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        display: none;
+        color: #999999;
+        font-size: 13px;
+    }
+
+    #iframeLocation{
+         width: 600px;
+         max-width: 600px;
+    }
+    #errorhandler{
+        display:none;
+        color:red;
+    }
+    /*#drawerContainer{
+        position: fixed; 
+        bottom: 50%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index:5;
+        width:253px;
+        height:184px;
+        background-color:red;
+        display:none;
+        border-style: solid;
+        border-color: #112d5d;
+       
+    }
+    #drawerClose{
+        width:248px;
+        height:30px;
+        background-color: #112d5d;
+        color: white;
+        text-align:center;
+    }
+
+    #drawer{ 
+        background-color:white;       
+        width:248px;
+        height:148px;         
+    }
+    #rooms{
+        display:none;
+    }*/
+</style>
+
+@*<div id="rooms">@result</div>*@
+
+@if (Model.Level.PlanName.PlanAdded)
+{
+    <div id="levelUrl">@Model.Level.PlanName.URLToDownload</div>
+}
+else
+{
+    <div id="levelUrl">None</div>
+}
+
+@if (Model.Level.PlanName.PlanAdded)
+{
+    <div class="row">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6">
+            <div id="pdf-main-container">
+                <div id="pdf-loader">Loading document ...</div>
+                <div id="pdf-contents">
+                    <div id="pdf-meta">
+                        <div id="pdf-buttons">
+                            <button id="pdf-prev" class="btn btn-default btn-lg">Previous</button>
+                            <button id="pdf-next" class="btn btn-default btn-lg">Next</button>
+                        </div>
+                        <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div>
+                    </div>
+                    <canvas id="pdf-canvas" width="400"></canvas>
+                    <div id="page-loader">Loading page ...</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            @if ((Model.Level.PlanName.PlanAdded) && (Model.HasUser == true && Model.AppUser.Permission != 2))
+            {           
+               <a href="@Model.Level.PlanName.URLToDownload" class="btn btn-default btn-lg">Download Level Plan</a>           
+            }
+        </div>
+    </div>
+}
+
+<h3>Rooms</h3>
+<div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-6">
+        <table class="table">
+            <tbody>
+                @foreach (var item in Model.Rooms)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td><a href="@item.ViewURL" class="btn btn-default btn-lg">View</a></td>
+                        @if (Model.HasUser && Model.AppUser.Permission > 2)
+                        {
+                            <td><a href="#" class="btn btn-default btn-lg" id="@item.Id">Delete</a></td>
+                        }
+                        @*<td><a href="#" class="btn btn-default btn-lg" id="@item.ProjectID & @item.LevelID & @item.Id ">Add Tour</a></td>*@
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+<div id="pModal1" class="w3-modal">
+    <div class="w3-modal-content">
+        <header class="w3-container w3-dark-grey">
+            <span onclick="document.getElementById('pModal1').style.display = 'none'"
+                  class="w3-button w3-display-topright">&times;</span>
+            <h2>Add Tour</h2>
+        </header>
+        <div class="w3-container">
+            <div>
+                <label for="Link"><b>Iframe URL:</b></label>
+                <input id="iframeLocation" type="text" placeholder="Enter Iframe URL" name="Link" required>
+                <a href="#" class="btn btn-default btn-lg">Add URL</a>
+            </div>
+            <div>
+                <h3 id="errorhandler">No URL Entered</h3>
+            </div>
+        </div>
+        <footer class="w3-container w3-dark-grey">
+            <h1></h1>
+        </footer>
+    </div>
+</div>
+
+@*<h3>Tour Properties</h3>
+<div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-6">
+        <table class="table">
+            <tbody>                
+                    <tr>
+                        <td></td>
+                        <td><a href="#" class="btn btn-default btn-lg">Upload Level Picture</a></td>
+                        <td><a href="#" class="btn btn-default btn-lg">Create Floor Hotspots</a></td>
+                    </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3"></div>
+</div>*@
+<div>
+    @Html.ActionLink("Back", "Levels/" + Model.Level.ProjectID, "Home")
+</div>
+
+@*<div id="drawerContainer">
+    <div id="drawerClose">Click Here To Close</div>
+    <div id="drawer"></div>
+</div>*@
+<script>
+        var PID, LID, RID
+        function AddRoom() {
+            var e = document.getElementById("addRoomText");
+            var value = e.options[e.selectedIndex].value;
+            $.getJSON("../AddRoom", { room: value }, function (data) {
+                location.reload();
+            });
+        }
+        $('a').click(function (e) {
+            var id = e.currentTarget.id;
+            var value = e.currentTarget.innerText;
+            if (value.trim() == "Delete") {
+                e.preventDefault();
+                $.getJSON("../DeleteRoom", { room: id }, function (data) {
+                    location.reload();
+                });
+            }
+            else if (value.trim() == "Add Tour") {
+                e.preventDefault();
+                var infoToServer = id.split("&");
+                PID = parseInt(infoToServer[0].trim());
+                LID = parseInt(infoToServer[1].trim());
+                RID = parseInt(infoToServer[2].trim());
+                document.getElementById('pModal1').style.display = 'block';
+               
+                //$.getJSON("../DeleteRoom", { room: id }, function (data) {
+                   // location.reload();
+               // });
+            }
+            else if (value.trim() == "Add URL") {
+                e.preventDefault();
+                var iframe = document.getElementById('iframeLocation').value;
+                if (iframe.trim().length == 0) {
+                    document.getElementById('errorhandler').style.display = 'block';
+                    return;
+                }
+                if (iframe.trim().indexOf("plushglobalmedia.com") == -1) {
+                    document.getElementById('errorhandler').style.display = 'block';
+                    return;
+                }
+                $.post("../AddRoomTour", { pId: PID, lid:LID, rid:RID, src: iframe.trim() }, function (data) {
+                    document.getElementById('errorhandler').style.display = 'none';
+                    document.getElementById('pModal1').style.display = 'none';
+                    document.getElementById('iframeLocation').value = "";
+                });
+            }
+
+            //else if ("Create Floor Hotspots") {
+            //    if (hasDrawer == 0) {
+            //        document.getElementById("drawerContainer").style.display = "block";
+            //        handleDrawer();
+            //        hasDrawer = 1;
+                                      
+            //    }
+            //    else {
+            //        document.getElementById("drawerContainer").style.display = "block";
+            //    }
+            //}
+        });
+
+
+        //var rooms = document.getElementById("rooms").innerText;
+        //if (rooms.trim().length > 0) {
+        //    rooms = rooms.trim().split(",");
+
+        //}
+        //var hasDrawer = 0;
+        //var layer2 = new Konva.Layer();
+        //var selectX = -1, selectY = -1, selectId = -1;
+        //getDrawerInfo();
+        //function getDrawerInfo() {
+        //}
+        //function handleDrawer() {
+        //    var cont2 = document.getElementById("drawer");
+        //    var width = cont2.offsetWidth;
+        //    var height = cont2.offsetHeight;
+        //    var stage = new Konva.Stage({
+        //        container: cont2,
+        //        width: width,
+        //        height: height
+        //    });
+        //    stage.add(layer2);
+        //}
+
+        //$("#drawer").click(function (e) {
+        //    if (hasDrawer == 0) {
+        //        return;
+        //    }
+        //    var posX = $(this).offset().left, posY = $(this).offset().top;
+        //    selectX = e.pageX - posX;
+        //    selectY = e.pageY - posY;
+        //    selectId = 1;
+            
+        //});
+
+        //function addHotspot() {
+
+        //    drawCircle(selectX, selectY, selectId);
+        //}
+        //function drawCircle(_x,_y,id) {
+        //    var circle = new Konva.Circle({
+        //        x: _x,
+        //        y: _y,
+        //        radius: 10,
+        //        fill: 'red',
+        //        stroke: 'black',
+        //        strokeWidth: 1,
+        //        id: 1
+        //    });
+        //    layer2.add(circle);
+        //    layer2.draw();
+        //}
+        //$("#drawerClose").click(function (e) {
+        //    document.getElementById("drawerContainer").style.display = "none";
+        //});    
+        
+    </script>
+<script>
+
+        var __PDF_DOC,
+            __CURRENT_PAGE,
+            __TOTAL_PAGES,
+            __PAGE_RENDERING_IN_PROGRESS = 0,
+            __CANVAS = $('#pdf-canvas').get(0),
+            __CANVAS_CTX = __CANVAS.getContext('2d');
+
+        function showPDF(pdf_url) {
+            $("#pdf-loader").show();
+            PDFJS.getDocument({ url: pdf_url }).then(function (pdf_doc) {
+                __PDF_DOC = pdf_doc;
+                __TOTAL_PAGES = __PDF_DOC.numPages;
+
+                // Hide the pdf loader and show pdf container in HTML
+                $("#pdf-loader").hide();
+                $("#pdf-contents").show();
+                $("#pdf-total-pages").text(__TOTAL_PAGES);
+
+                // Show the first page
+                showPage(1);
+            }).catch(function (error) {
+                // If error re-show the upload button
+                $("#pdf-loader").hide();
+                $("#upload-button").show();
+
+                alert(error.message);
+            });;
+        }
+
+        function showPage(page_no) {
+            __PAGE_RENDERING_IN_PROGRESS = 1;
+            __CURRENT_PAGE = page_no;
+
+            // Disable Prev & Next buttons while page is being loaded
+            $("#pdf-next, #pdf-prev").attr('disabled', 'disabled');
+
+            // While page is being rendered hide the canvas and show a loading message
+            $("#pdf-canvas").hide();
+            $("#page-loader").show();
+
+            // Update current page in HTML
+            $("#pdf-current-page").text(page_no);
+
+            // Fetch the page
+            __PDF_DOC.getPage(page_no).then(function (page) {
+                // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+                var scale_required = __CANVAS.width / page.getViewport(1).width;
+
+                // Get viewport of the page at required scale
+                var viewport = page.getViewport(scale_required);
+
+                // Set canvas height
+                __CANVAS.height = viewport.height;
+
+                var renderContext = {
+                    canvasContext: __CANVAS_CTX,
+                    viewport: viewport
+                };
+
+                // Render the page contents in the canvas
+                page.render(renderContext).then(function () {
+                    __PAGE_RENDERING_IN_PROGRESS = 0;
+
+                    // Re-enable Prev & Next buttons
+                    $("#pdf-next, #pdf-prev").removeAttr('disabled');
+
+                    // Show the canvas and hide the page loader
+                    $("#pdf-canvas").show();
+                    $("#page-loader").hide();
+                });
+            });
+        }
+
+        var url = document.getElementById("levelUrl").innerText.trim();
+        if (url != "None") {
+            showPDF(url);
+        }
+
+
+        // Previous page of the PDF
+        $("#pdf-prev").on('click', function () {
+            if (__CURRENT_PAGE != 1)
+                showPage(--__CURRENT_PAGE);
+        });
+
+        // Next page of the PDF
+        $("#pdf-next").on('click', function () {
+            if (__CURRENT_PAGE != __TOTAL_PAGES)
+                showPage(++__CURRENT_PAGE);
+        });
+
+    </script>

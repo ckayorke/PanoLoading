@@ -1,0 +1,52 @@
+﻿@model PanoLoading.Models.DecisionViewModel
+@{
+    ViewBag.Title = "About";
+}
+
+@if(Model.HasUser && Model.AppUser.Permission == 3)
+{
+<hr />
+    <style>
+        .btn:hover{
+         background-color: #112d5d;
+         color: white;
+        }
+    </style>
+<div class="row">
+    <div class="col-md-1">
+    </div>
+    <div class="col-md-2">       
+           <p><a href="@Url.Action("Administration", "Home")" class="btn btn-default btn-lg">Manage Users</a></p>              
+    </div>
+    <div class="col-md-2">       
+          <p><a href="@Url.Action("ProjectList", "Home")" class="btn btn-default btn-lg">Admin View</a></p>              
+    </div>
+    <div class="col-md-2">
+        <p><a href="@Url.Action("DecisionList", "Home")" class="btn btn-default btn-lg">User View</a></p>
+    </div>
+    <div class="col-md-2">     
+           <p><a href="@Url.Action("CreateProject", "Home")" class="btn btn-default btn-lg">Create New Project</a></p>
+    </div>
+    <div class="col-md-2">
+        <p><a href="" class="btn btn-default btn-lg" id="cleanServer">Clean Server</a></p>
+    </div>
+    <div class="col-md-1">
+    </div>
+</div>
+}
+
+<script>  
+    $('#cleanServer').click(function (e) {
+        e.preventDefault();
+        var str1 = window.location.href.split("Home");
+        var href = str1[0] + "Home/CleanServer";
+        var href2 = str1[0] + "Home/ExpiredProjectDelete";
+        $.getJSON(href, function (data) {
+            alert(data);
+            $.getJSON(href2, function (data2) {
+                alert(data2);
+                location.reload();
+            });
+        });
+    });
+</script>

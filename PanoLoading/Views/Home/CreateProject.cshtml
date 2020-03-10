@@ -1,0 +1,125 @@
+﻿@using PanoLoading.Models
+@model CreateProjectViewModel
+@{
+  
+    ViewBag.Title = "Create Project";
+    var k = Model.ProjectStates;
+}
+
+<style>
+    .btn:hover{
+         background-color: #112d5d;
+         color: white;
+        }
+
+</style>
+
+
+<h2>@ViewBag.Title</h2>
+<hr />
+<div class="row">
+    <div class="col-md-3">
+    </div>
+        <div class="col-md-6">           
+            <section id="loginForm">
+                @using (Html.BeginForm("CreateProject", "Home", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()                   
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })                  
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Address, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.City, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ZIPCode, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(m => m.ZIPCode, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.ZIPCode, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.ProjectState, new { @class = "col-md-2 control-label" })                       
+                        <div class="col-md-10">                           
+                           @Html.DropDownList("ProjectState", (Model.ProjectStates as List<SelectListItem>), new { @class = "form-control" })
+                           @Html.ValidationMessageFor(m => m.ProjectState, "", new { @class = "text-danger" })                         
+                           
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Fielder, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("Fielder", (Model.Fielders as List<SelectListItem>),  new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Fielder, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Drawer, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("Drawer", (Model.Fielders as List<SelectListItem>), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Drawer, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Notes, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Notes, new { cols = 60, rows = 5, @class = "form-control" })
+       
+                            @Html.ValidationMessageFor(m => m.Notes, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.Resolution, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.DropDownList("Resolution", (Model.Resolutions as List<SelectListItem>), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(m => m.Resolution, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Submit" class="btn btn-default" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            @if (Model.Valid==0)
+                            {
+                            }
+                            @if (Model.Valid == 1)
+                            {
+                                <h3 id="label">Project Already Exists</h3>
+                            }
+                            @if (Model.Valid == 2)
+                            {
+                                <h3 id="label">Permission Level Is Low</h3>
+                            }                            
+                        </div>
+                    </div>
+                }
+            </section>
+        </div>
+        <div class="col-md-3">               
+        </div>
+    </div>
+<div>
+    @Html.ActionLink("Back", "Decision", "Home")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

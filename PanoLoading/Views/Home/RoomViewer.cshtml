@@ -1,0 +1,399 @@
+﻿@using PanoLoading.Models
+@model ViewerViewModel
+@{
+    ViewBag.Title = "About";    
+}
+<style>
+    html {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    }
+    body {
+        background-color: #000000;
+        margin: 0px;
+        overflow: hidden;
+        touch-action: none;
+        padding-top: 0px; 
+        padding-bottom: 0px; 
+    }
+
+    #info {
+        position: absolute;
+        bottom: 0px;
+        width: 30%;
+        color: #ffffff;
+        padding: 5px;
+        font-family: Monospace;
+        font-size: 13px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    a {
+        color: #ffffff;
+    }
+
+    .body-content {
+     padding-left: 0px; 
+     padding-right:0px; 
+    }
+    .container {
+     max-width: 100%; 
+    }
+    .container {
+        max-width: 100%; 
+    }
+    .container {
+     padding-right: 0px; 
+     padding-left: 0px; 
+     margin-right: 0; 
+     margin-left: 0; 
+     overflow: hidden;
+   }
+
+    hr, footer, #evt, #url, #mInfo, #pInfo{
+    display: none;
+   }
+
+    .no3D {
+        position:absolute;
+        left:50%;
+        top:50%;
+        margin-left:auto;
+        margin-right:auto;
+        z-index:100
+     }
+    
+
+             #bar {
+                 display: block;
+                 position: absolute;
+                 z-index: 2;
+                 top: 60px;
+                 left: 74px;                 
+              }
+              .btn {
+                  background-color: #112d5d;
+                  border: none;
+                  color: white;
+                  padding: 12px 16px;
+                  font-size: 16px;
+                  cursor: pointer;
+                }               
+                .btn:hover {
+                  background-color: RoyalBlue;
+                  color: white;
+                } 
+                            
+               
+                
+                               
+                table.gridtable {
+	                font-family: verdana,arial,sans-serif;
+	                font-size:11px;
+	                color:#333333;
+	                border-width: 1px;
+	                border-color: #666666;
+	                border-collapse: collapse;
+                }
+                table.gridtable th {
+	                border-width: 1px;
+	                padding: 8px;
+	                border-style: solid;
+	                border-color: #666666;
+                    background-color: #112d5d;
+	                color: white;
+                }
+                table.gridtable td {
+	                border-width: 1px;
+	                padding: 8px;
+	                border-style: solid;
+	                border-color: #666666;
+	                background-color: #ffffff;
+                }
+
+                #plan {
+                    position: absolute;
+                    bottom: 0px;
+                    text-align:center;                    
+                    width: 100%;
+                    color: #ffffff;
+                    padding: 5px;
+                    font-family: Monospace;
+                    font-size: 13px;
+                    font-weight: bold;        
+                }              
+                
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<div id="evt">@Model.ha3D</div>
+<div id="url">@Model.URL</div>
+<div id="mInfo">@Model.Info</div>
+<div id="pInfo">@Model.FloorURL</div>
+
+<div id="info">    
+</div> 
+
+<div id="plan">
+    <img src="" alt="No Picture" width="300" height="600" id="Pik1">
+    <img src="" alt="No Picture" width="300" height="600" id="Pik2">
+</div>
+
+<div id="bar">
+    <button class="btn" onclick="openModal(1)"><i  id="tableButton" style="font-size:24px">Hide Table</i></button>
+    <button class="btn" onclick="openModal(2)"><i  id="planButton" style="font-size:24px">Hide Layout</i></button>
+</div>      
+<div id="container2">
+</div>
+<h1 class="no3D" id="no3D">No 3D Image Found</h1>
+<script>  
+    document.getElementById("evt").style.display = "none";
+    document.getElementById("url").style.display = "none";
+    document.getElementById("mInfo").style.display = "none";
+    var evt = document.getElementById("evt").innerText.trim();
+    var url = document.getElementById("url").innerText.trim();
+    var mInfo = document.getElementById("mInfo").innerText.trim();
+    mInfo = mInfo.split("-");
+	var camera, scene, renderer;
+	var isUserInteracting = false;
+	var	onMouseDownMouseX = 0;
+	var onMouseDownMouseY = 0;
+	var lon = 0;
+	var onMouseDownLon = 0;
+	var lat = 0;
+	var onMouseDownLat = 0;
+	var phi = 0;
+    var  theta = 0;
+	init();
+	function init() {
+	    if (evt == "false") {
+	        return;
+	    }
+
+	    var pInfo = document.getElementById("pInfo").innerText.trim();
+	    var pInfo1 = pInfo.split(";");
+	    for (var t = 0; t < pInfo1.length; t++) {
+	        if(t==0){
+	            $("#Pik1").attr("src", pInfo1[t]);
+	            //document.getElementById("Pik1").style.display = "block";
+	        }
+	        if (t == 1) {
+	            $("#Pik2").attr("src", pInfo1[t]);
+	            //
+	        }
+	    }
+
+	    if (pInfo1.length == 1) {
+	        document.getElementById("Pik2").style.display = "none";
+	    }
+
+
+	    document.getElementById("no3D").style.display = "none";
+		var container, mesh;
+		container = document.getElementById( 'container2' );
+		camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
+		camera.target = new THREE.Vector3( 0, 0, 0 );
+		scene = new THREE.Scene();
+
+		var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+		// invert the geometry on the x-axis so that all of the faces point inward
+		geometry.scale( - 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( {
+		    map: new THREE.TextureLoader().load(url)
+		} );
+		mesh = new THREE.Mesh( geometry, material );
+		scene.add( mesh );
+		renderer = new THREE.WebGLRenderer();
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
+
+		document.addEventListener( 'mousedown', onPointerStart, false );
+		document.addEventListener( 'mousemove', onPointerMove, false );
+		document.addEventListener( 'mouseup', onPointerUp, false );
+		document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+		document.addEventListener( 'touchstart', onPointerStart, false );
+		document.addEventListener( 'touchmove', onPointerMove, false );
+		document.addEventListener( 'touchend', onPointerUp, false );
+
+		document.addEventListener( 'dragover', function ( event ) {
+			event.preventDefault();
+			event.dataTransfer.dropEffect = 'copy';
+		}, false );
+
+		document.addEventListener( 'dragenter', function () {
+			document.body.style.opacity = 0.5;
+		}, false );
+
+		document.addEventListener( 'dragleave', function () {
+			document.body.style.opacity = 1;
+		}, false );
+
+		document.addEventListener( 'drop', function ( event ) {
+			event.preventDefault();
+			var reader = new FileReader();
+			reader.addEventListener( 'load', function ( event ) {
+				material.map.image.src = event.target.result;
+				material.map.needsUpdate = true;
+
+			}, false);
+		   
+		     reader.readAsDataURL( event.dataTransfer.files[ 0 ] )
+			  document.body.style.opacity = 1;
+
+		}, false );
+
+		window.addEventListener('resize', onWindowResize, false);
+		animate();
+		buildTable();
+	}
+
+	function onWindowResize() {
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+	}
+
+	function onPointerStart( event ) {
+		isUserInteracting = true;
+		var clientX = event.clientX || event.touches[ 0 ].clientX;
+		var clientY = event.clientY || event.touches[ 0 ].clientY;
+		onMouseDownMouseX = clientX;
+		onMouseDownMouseY = clientY;
+		onMouseDownLon = lon;
+		onMouseDownLat = lat;
+
+
+
+	}
+
+	function onPointerMove( event ) {
+		if ( isUserInteracting === true ) {
+			var clientX = event.clientX || event.touches[ 0 ].clientX;
+			var clientY = event.clientY || event.touches[ 0 ].clientY;
+
+			lon = ( onMouseDownMouseX - clientX ) * 0.1 + onMouseDownLon;
+			lat = ( clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
+		}
+
+	}
+	function onPointerUp() {
+		isUserInteracting = false;
+	}
+	function onDocumentMouseWheel( event ) {
+		var fov = camera.fov + event.deltaY * 0.05;
+		camera.fov = THREE.Math.clamp( fov, 10, 75 );
+		camera.updateProjectionMatrix();
+	}
+	function animate() {
+		requestAnimationFrame( animate );
+		update();
+	}
+	function update() {
+		if ( isUserInteracting === false ) {
+//					lon += 0.1;
+		}
+		lat = Math.max( - 85, Math.min( 85, lat ) );
+		phi = THREE.Math.degToRad( 90 - lat );
+		theta = THREE.Math.degToRad(lon);
+
+		camera.target.x = 500 * Math.sin( phi ) * Math.cos( theta );
+		camera.target.y = 500 * Math.cos( phi );
+		camera.target.z = 500 * Math.sin(phi) * Math.sin(theta);
+		camera.lookAt( camera.target );
+		/*
+		// distortion
+		camera.position.copy( camera.target ).negate();
+		*/
+		renderer.render( scene, camera );
+	}
+
+	function buildTable() {
+	    var data = getData();
+	    var table = document.createElement("table");
+	    table.className = "gridtable";
+	    var thead = document.createElement("thead");
+	    var tbody = document.createElement("tbody");
+	    var headRow = document.createElement("tr");
+	    ["Feature", "Measure"].forEach(function (el) {
+	        var th = document.createElement("th");
+	        th.appendChild(document.createTextNode(el));
+	        headRow.appendChild(th);
+	    });
+	    thead.appendChild(headRow);
+	    table.appendChild(thead);
+	    data.forEach(function (el) {
+	        var tr = document.createElement("tr");
+	        for (var o in el) {
+	            var td = document.createElement("td");
+	            td.appendChild(document.createTextNode(el[o]))
+	            tr.appendChild(td);
+	        }
+	        tbody.appendChild(tr);
+	    });
+	    table.appendChild(tbody);
+	    document.getElementById("info").appendChild(table);
+	}
+
+	function getData() {
+	    var s = mInfo[4].trim().split(",");
+	    var s2 = [];
+	    for (var i = 0; i < s.length; i++) {
+	        if(s[i].trim().length>0){
+	            s2.push(s[i].trim());
+	        }
+	    }
+
+	    var data = [
+         { "1": "Project", "Project": mInfo[0].trim() },
+         { "1": "Name", "Name": mInfo[1].trim() },
+         { "1": "Level", "Level": mInfo[2].trim() },
+         { "1": "Shape", "Shape": mInfo[3].trim() },
+         { "1": "Measurements", "Measurements": "" }];
+
+	    for (var i = 0; i < s2.length; i++) {
+	        var k = "Wall " + (1 + i);
+
+	        var toFeet = (parseFloat(s2[i]) * 3.28084).toFixed(1) + " Feets"
+	        //data.push({ "1": k, k: s2[i] });
+	        data.push({ "1": k, k: toFeet });
+	    }
+	    return data;
+	}
+	function openModal(id) {
+	    if (id == 1) {
+	        var x = document.getElementById("info");
+	        if (x.style.display === "none") {
+	            x.style.display = "block";
+	        } else {
+	            x.style.display = "none";
+	        }
+
+	        var j = document.getElementById("tableButton");
+	        if (j.innerText.trim() == "Hide Table") {
+	            j.innerText = "Show Table";
+	        }
+	        else {
+	            j.innerText = "Hide Table";
+	        }
+	    }
+	    else if (id == 2) {
+	        var x = document.getElementById("plan");
+	        if (x.style.display === "none") {
+	            x.style.display = "block";
+	        } else {
+	            x.style.display = "none";
+	        }
+
+	        var j = document.getElementById("planButton");
+	        if (j.innerText.trim() == "Hide Layout") {
+	            j.innerText = "Show Layout";
+	        }
+	        else {
+	            j.innerText = "Hide Layout";
+	        }
+	    }	        
+	}
+</script>

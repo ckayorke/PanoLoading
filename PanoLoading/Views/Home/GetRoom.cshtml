@@ -1,0 +1,190 @@
+﻿@using PanoLoading.Models
+@model RoomDetailsViewModel
+
+@{
+    //ViewBag.Title = "Room Details";
+}
+<h3>@ViewBag.Title</h3>
+<hr />
+<style>
+    .btn:hover {
+        background-color: #112d5d;
+        color: white;
+    }
+</style>
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <table class="table">           
+            <tbody>               
+                @*<tr>
+                        <td>Level</td>
+                        <td>@Model.Room.LevelName</td>
+                    </tr>
+
+                    @if (Model.HasUser && Model.AppUser.Permission > 1)
+                    {
+                        <tr>
+                            <td>Upload Pictures</td>
+                            <td>
+                                @using (Html.BeginForm("PictureUploadFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    <div class="form-group">
+                                        <div class="col-md-10">
+                                            @Html.TextBox("file", "", new { type = "file", @class = "form-control" }) <br />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-offset-2 col-md-10">
+                                            <input type="submit" value="Upload Picture" class="btn btn-default" />
+                                        </div>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                     }*@
+                <tr>
+                    <td>Pictures</td>
+                    <td>                      
+                        @for(var  i =0; i < Model.Room.Pictures.Count; i ++)
+                        {
+                            @Html.ActionLink("Viewer 3D Room: Picture" + (i +1), "RoomViewer", new { id = Model.Room.Id, item = Model.Room.Pictures[i].Id})
+                            <br />
+                        }
+                    </td>
+                </tr>
+                
+
+                @if (Model.HasUser && (Model.AppUser.Permission == 1 || Model.AppUser.Permission == 3))
+                {
+                <tr>
+                    <td>Upload Floor Plan</td>
+                    <td>
+                        @using (Html.BeginForm("RoomPlanUploadFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="form-group">
+                                <div class="col-md-10">
+                                    @Html.TextBox("file", "", new { type = "file", @class = "form-control" }) <br />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <input type="submit" value="Upload Plan" class="btn btn-default" />
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+                }
+                @if (Model.Room.PlanName.PlanAdded && Model.HasUser && (Model.AppUser.Permission == 1 || Model.AppUser.Permission == 3))
+                {
+                    <tr>
+                        <td>Floor Plan</td>
+                        <td>                      
+                            <a href="@Model.Room.PlanName.URLToViewer" class="btn btn-default">View Floor Plan</a>
+                            <a href="@Model.Room.PlanName.URLToDownload" class="btn btn-default">Download Floor Plan</a>
+                        </td>
+                    </tr>                    
+                } 
+                
+                @*<tr>
+                    <td>Adding Neigbors</td>
+                    <td>                        
+                        <div class="form-group">                            
+                            <div class="col-md-10">
+                                @Html.DropDownList("Neigbor", (Model.RoomNamesList as List<SelectListItem>), new { @class = "form-control", id="neighbors" })  <br />                                  
+                            </div>
+                        </div>                           
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="button"  id="addNeighbor" value="Add Neighbor" class="btn btn-default" />
+                            </div>
+                        </div>                       
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @if(Model.AppUser.Permission > 1)
+                        {
+                            <div>Click Neighbor To Delete</div>
+                        }                       
+                    </td>
+                    <td>
+                        @foreach (var item in Model.Room.ConnectorList)
+                        {
+                            <a href="@item" class="btn btn-default" name="neighborItem">@item</a>
+                        }
+                    </td>
+                </tr>*@ 
+                <tr  style="display:none">
+                    <td></td>
+                    <td>
+                        <div id="user">@Model.AppUser.Permission</div>
+                    </td>
+                </tr>           
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3"></div> 
+</div>
+
+<div>
+    @Html.ActionLink("Back", "GetLevel/" + Model.Room.LevelID, "Home")
+</div>
+
+<script>  
+    $('a').click(function (e) {
+        var name = e.currentTarget.name;       
+        if (name.trim() == "ToViewer") {
+            e.preventDefault();
+            window.open("https://www.w3schools.com");
+        }
+        else if (name.trim() == "neighborItem") {
+            e.preventDefault();         
+            try {
+                var user = parseInt(document.getElementById("user").innerText);
+                if (user < 2) {
+                    return;
+                }
+                var value = e.currentTarget.innerText;
+                $.getJSON("../DeleteNeighbor", { neighbor: value }, function (data) {
+                    location.reload();
+                });
+            }
+            catch (eer) {
+            }           
+        }
+        else if (name.trim() == "ToDelete") {
+            e.preventDefault();
+            try {
+                var user = parseInt(document.getElementById("user").innerText);
+                if (user < 2) {
+                    return;
+                }
+                var id = e.currentTarget.id.trim();
+                if (id == "") {
+                    return;
+                }               
+                $.getJSON("../DeletePicture", { info: id}, function (data) {
+                    location.reload();
+                });
+            }
+            catch (eer) {
+            }
+        }
+    });
+
+    $('#addNeighbor').click(function (e) {
+        var e = document.getElementById("neighbors");
+        var value = e.options[e.selectedIndex].value;
+        $.getJSON("../AddNeighbor", { neighbor: value }, function (data) {
+            location.reload();
+        });
+    });    
+</script>
+
+

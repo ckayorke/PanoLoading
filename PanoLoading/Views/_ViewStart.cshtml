@@ -1,0 +1,13 @@
+﻿@{
+
+
+    string urlTo = Request.Url.ToString();
+    if (urlTo.Contains("CustomerViewer") || urlTo.Contains("CustomerRoomViewer"))
+    {
+        Layout = "~/Views/Shared/_Layout1.cshtml";
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}

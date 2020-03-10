@@ -1,0 +1,67 @@
+﻿@using PanoLoading.Models
+@model ModifyProjectViewModel
+@{
+    ViewBag.Title = "Project Details";
+}
+<h2>@ViewBag.Title</h2>
+<hr />
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <table class="table">           
+            <tbody>
+                <tr>                    
+                    <td>Creator</td>
+                    <td>@Model.project.Creator</td>
+                    <td></td>
+                </tr>
+                <tr>                   
+                    <td>Address</td>
+                    <td>@Model.project.Address</td>
+                    <td>
+                        @if (Model.HasUser && Model.AppUser.Permission > 1)
+                        {
+                            <a href="@Url.Action("EditProjectAddress", "Home")" class="btn btn-default btn-lg">Update</a>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>City</td>
+                    <td>@Model.project.City</td>
+                    <td>
+                        @if (Model.HasUser && Model.AppUser.Permission > 1)
+                        {
+                            <a href="@Url.Action("EditProjectAddress", "Home")" class="btn btn-default btn-lg">Update</a>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>Zip Code</td>
+                    <td>@Model.project.Zip</td>
+                    <td>
+                        @if (Model.HasUser && Model.AppUser.Permission > 1)
+                        {
+                            <a href="@Url.Action("EditProjectAddress", "Home")" class="btn btn-default btn-lg">Update</a>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td>State</td>
+                    <td>@Model.project.State</td>
+                    <td>
+                        @if (Model.HasUser && Model.AppUser.Permission > 1)
+                        {
+                            <a href="@Url.Action("EditProjectAddress", "Home")" class="btn btn-default btn-lg">Update</a>
+                        }
+                    </td>
+                </tr>
+                <tr>                    
+                    <td>Levels</td>
+                    <td>@Model.project.Levels</td>
+                    <td><a href="@Url.Action("Levels", "Home")" class="btn btn-default btn-lg">Details</a></td>
+                </tr>                
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3"></div> 
+</div>

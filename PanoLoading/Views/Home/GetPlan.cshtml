@@ -1,0 +1,44 @@
+﻿@using PanoLoading.Models
+@model PlanViewModel
+
+@{
+    ViewBag.Title = "Plan Details";
+}
+<h2>@ViewBag.Title</h2>
+<hr />
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <table class="table">           
+            <tbody> 
+                <tr>
+                    <td>Project ID</td>
+                    <td>@Model.Room.ProjectID</td>
+                </tr> 
+                <tr>
+                    <td>Level</td>
+                    <td>@Model.Room.LevelName</td>
+                </tr>
+                <tr>
+                    <td>Room</td>
+                    <td>@Model.Room.Name</td>
+                </tr>                     
+                <tr>
+                    <td></td>
+                    <td>
+                        <div>
+                            <img src="@Url.Content(Model.Id)" alt="@Model.Room.Name" width="250" height="250">                           
+                        </div>                       
+                    </td>
+                </tr>      
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3"></div> 
+</div>
+
+<div>
+    @Html.ActionLink("Back", "GetRoom/" + Model.Room.Id, "Home")
+</div>
+
+

@@ -1,0 +1,33 @@
+﻿@model PanoLoading.Models.Project
+
+@{
+    ViewBag.Title = "ProjectEdit";
+}
+<h2>Outside Pictures</h2>
+<div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+        <table class="table">
+            <tbody>
+                @foreach (var item in Model.OutPicUrl)
+                {
+                <tr>
+                    <td>
+                        <div>
+                            <img src="@Url.Content(item)" alt="No Preview" width="400" height="600">
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-4"></div>
+</div>
+
+<div>
+    @Html.ActionLink("Back to List", "ProjectList", "Home")
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

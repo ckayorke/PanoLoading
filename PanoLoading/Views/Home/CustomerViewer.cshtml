@@ -1,0 +1,289 @@
+﻿@{
+    ViewBag.Title = "Customer Viewer";
+}
+<style>   
+    iframe {
+        border-width: 0px;       
+    }
+    img{
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index:10
+    }
+
+    #sideContainer{
+      position: absolute;
+      top: 40px;
+      right: 0;
+      z-index:10
+    }
+
+    #logo{         
+         background-color: #505050;         
+    }
+
+    .sidepanel  {
+      width: 0;
+      position: fixed;     
+      height: 600px;
+      top: 40px;
+      right: 0;
+      background-color: #505050;
+      overflow-x:hidden;
+      overflow-x:scroll;
+      direction: rtl;
+      transition: 0.5s;
+      padding-top: 60px;
+      text-align: center
+    }
+
+    
+    .sidepanel .closebtn {
+      position: absolute;
+      top: 0;
+      right: 25px;
+      font-size: 36px;
+    }
+
+    .openbtn {
+      font-size: 20px;
+      cursor: pointer;
+      background-color: #111;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+    }
+    .openbtn:hover {
+      background-color:#444;
+    }
+   
+    #selectedProject, #selectedProjectRoomsURL{
+        display:none;
+    }
+    .item{   
+        background-color:white;     
+        margin-bottom:10px;
+        border-radius:4px;
+    }
+
+
+    .loader {
+      border: 16px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 16px solid #3498db;
+      width: 60px;
+      height: 60px;
+      -webkit-animation: spin 2s linear infinite; 
+      animation: spin 2s linear infinite;
+    }
+
+    @@-webkit-keyframes spin {
+      0% { -webkit-transform: rotate(0deg); }
+      100% { -webkit-transform: rotate(360deg); }
+    }
+    @@keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #downloading{
+        display:none;
+    }
+
+     #pModal11.w3-modal-content{
+            border-radius: 6px;
+             width:1400px;  
+        }
+
+        #pModal12{
+          width:1400px;         
+        }
+
+        #pModal12.w3-container, #pModal13.w3-container{
+            padding:0px;
+         }
+
+        #pModal13{
+          height:60px;         
+        }
+
+</style> 
+<div id="selectedProject">"@Model.Id"</div>
+@*<div id="selectedProjectRoomsURL">"@ViewBag.RoomUrls"</div>*@
+
+<img src="" id="logo" width="151" height="40" />
+
+<div id="sideContainer">
+    <button class="openbtn" onclick="openNav()">☰ </button>
+    <div id="mySidepanel" class="sidepanel">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        @*<div class="item" id="downloadBtn"><a href="#">Download Room Images</a></div>
+        <div id="downloading">            
+            <div class="loader"></div>
+            <div>Downloading...</div>
+        </div>*@
+
+        <div class="item"><a href="@Model.FloorURL">Download Floor Plan</a></div>
+        @foreach (var obj in Model.RoomURLs)
+        {
+            <div class="item"><a href="@obj.Url">@obj.Name</a></div>
+        }
+    </div>
+</div>
+
+<iframe id="iframeSrc" src="@Model.URL" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+    <p>Your browser does not support iframes.</p>
+</iframe>
+
+
+<div id="pModal1" class="w3-modal">
+    <div id="pModal11" class="w3-modal-content">
+        <header id="pModal13" class="w3-container">
+            <span id="closeer" onclick="document.getElementById('pModal1').style.display = 'none'" class="w3-button w3-display-topright">&times;</span>
+        </header>
+        <div id="pModal12" class="w3-container">            
+            <div id="floorTour">
+                <iframe id="iframeSrc2" src=""
+                        width="100%" height="700"    allowfullscreen="true" mozallowfullscreen="true" 
+                        webkitallowfullscreen="true">
+                    <p>Your browser does not support iframes.</p>
+                </iframe>
+             </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(function () {
+        $('#iframeSrc').css({ height: $(window).innerHeight() });
+        $(window).resize(function () {
+            $('#iframeSrc').css({ height: $(window).innerHeight() });
+        });
+        var str = window.location.href.split("Home");
+        var root = str[0] + "UploadedPictureFiles/backup1.png";
+        document.getElementById("logo").src = root;
+        document.getElementById("logo").alt = "Logo";
+    });
+
+    function openNav() {
+        document.getElementById("mySidepanel").style.width = "250px";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidepanel").style.width = "0";
+    }
+    $('a').click(function (e) {
+        // var id = e.currentTarget.id;
+       
+         var value = e.currentTarget.innerText;
+         if (value.trim() == "Download Room Images") {
+             e.preventDefault();
+             
+             document.getElementById('downloading').style.display = "block";
+             document.getElementById('downloadBtn').style.display = "none";
+             
+             //ShowModalP();
+            var id4 = document.getElementById('selectedProject').innerText;
+            id4 = id4.replace('"', "");
+            id4 = id4.replace('"', "");
+            var id3 = parseInt(id4);
+            var url = '../GetPhotos?projectId=' + id3;
+            var filename = "bundle" + id3 + ".zip";;
+            var request = new XMLHttpRequest();
+            request.open('GET', url, true);
+            request.responseType = 'blob';
+            request.onload = function () {
+                var link = document.createElement('a');
+                link.id = "toDownload";
+                document.body.appendChild(link);
+                link.href = window.URL.createObjectURL(request.response);
+                link.download = filename;
+                link.click();
+                $.getJSON("../GetPhotosDeleteFile", { projectId: id3 }, function (data2) {
+                    document.getElementById("toDownload").remove();
+                    document.getElementById('downloading').style.display = "none";
+                    document.getElementById('downloadBtn').style.display = "block";
+                });
+            };
+            request.send();
+         }
+         else if (value.trim() == "Download Floor Plan") {
+             var href = e.currentTarget.href;
+             if (href.trim() == "#") {
+                 e.preventDefault();
+             }
+         }
+         else if (value.trim().indexOf(":") > -1) {
+             var href = e.currentTarget.href;
+             if (href.trim() == "#") {
+                 e.preventDefault();
+             }
+             else {
+                 e.preventDefault();                 
+                 openSubViewer(href.trim());
+             }
+         }
+    });
+    function openSubViewer(toUrl) {
+        document.getElementById("iframeSrc2").src =toUrl ;
+        var str = window.location.href.split("Home");
+        var root = str[0] + "UploadedPictureFiles/backup1.png";       
+        var root1 = str[0] + "UploadedPictureFiles/backup2.jpg";
+        var urlString = 'url(' + root1 + ')';
+        
+       
+        document.getElementById("pModal1").style.height = (window.innerHeight *0.92) + "px";
+        document.getElementById("pModal1").style.width = (window.innerWidth * 0.9) + "px";
+        
+        document.getElementById("pModal11").style.height = (window.innerHeight * 0.8) + "px";
+        document.getElementById("pModal11").style.width = (window.innerWidth * 0.8) + "px";
+        document.getElementById("iframeSrc2").style.height = (window.innerHeight * 0.74) + "px";
+        document.getElementById("iframeSrc2").style.width = (window.innerWidth * 0.8) + "px";
+        document.getElementById('pModal1').style.display = 'block';
+        closeNav();
+
+    }
+    dragElement(document.getElementById("pModal1"));
+    function dragElement(elmnt) {
+        var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        if (document.getElementById(elmnt.id + "pModal13")) {
+            /* if present, the header is where you move the DIV from:*/
+            document.getElementById(elmnt.id + "pModal13").onmousedown = dragMouseDown;
+        } else {
+            /* otherwise, move the DIV from anywhere inside the DIV:*/
+            elmnt.onmousedown = dragMouseDown;
+        }
+
+        function dragMouseDown(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // get the mouse cursor position at startup:
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            // call a function whenever the cursor moves:
+            document.onmousemove = elementDrag;
+        }
+
+        function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
+            // calculate the new cursor position:
+            pos1 = pos3 - e.clientX;
+            pos2 = pos4 - e.clientY;
+            pos3 = e.clientX;
+            pos4 = e.clientY;
+            // set the element's new position:
+            elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+            elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+        }
+
+        function closeDragElement() {
+            /* stop moving when mouse button is released:*/
+            document.onmouseup = null;
+            document.onmousemove = null;
+        }
+    }
+</script>
+ 

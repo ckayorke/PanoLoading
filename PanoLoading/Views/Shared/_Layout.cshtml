@@ -1,0 +1,104 @@
+﻿@{
+    string urlTo = Request.Url.ToString();
+    string URLToViewer = "";
+    if (urlTo.Contains("Account"))
+    {
+        var dataTo = urlTo.Split(new string[] { "Account" }, StringSplitOptions.None);
+        urlTo = dataTo[0];
+        URLToViewer = urlTo + "UploadedPictureFiles/NVMS.png";
+    }
+    else if (urlTo.Contains("Manage"))
+    {
+        var dataTo = urlTo.Split(new string[] { "Manage" }, StringSplitOptions.None);
+        urlTo = dataTo[0];
+        URLToViewer = urlTo + "UploadedPictureFiles/NVMS.png";
+    }
+    else
+    {
+        var dataTo = urlTo.Split(new string[] { "Home" }, StringSplitOptions.None);
+        urlTo = dataTo[0];
+        URLToViewer = urlTo + "UploadedPictureFiles/NVMS.png";
+    }
+
+
+
+
+} 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>AllView360 By NVMS Inc.</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/three")
+    @Scripts.Render("~/bundles/pdf")
+    @Scripts.Render("~/bundles/pdfworker")
+    @*<script src="https://unpkg.com/konva@4.0.16/konva.min.js"></script>*@
+    <style>
+        .imgcontainer {
+          text-align: center;
+          margin: 24px 0 12px 0;
+        }
+
+        img.avatar2 {
+          width: 20%;
+          border-radius: 5%;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">               
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @*@Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })*@
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Decision", "Home")</li>
+                    <li>@Html.ActionLink("Projects", "DecisionList", "Home")</li>
+                    <li>@Html.ActionLink("Contact NVMS", "Contact", "Home")</li>
+                    <li>@Html.ActionLink("IOS Support", "IOSSupport", "Home")</li>
+                    <li>@Html.ActionLink("Android Support", "AndroidSupport", "Home")</li>
+                    <li>@Html.ActionLink("Privacy Policy", "PrivacyPolicy", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr  id="hr2"/>
+        <footer id="footer"> 
+            <div class="imgcontainer" id="myLogo">
+                <img src="@Url.Content(URLToViewer)" alt="LOGO" class="avatar2">
+            </div>       
+            <p>&copy; @DateTime.Now.Year - NVMS, Inc.</p>
+        </footer>
+        <script>
+            var k = window.location.href;
+            if (k.indexOf("Account") > -1 && k.indexOf("Login") > -1) {
+                document.getElementById("myLogo").style.display = "none";
+            }
+            else if (k.indexOf("Manage") > -1) {
+                document.getElementById("myLogo").style.display = "block";
+            } 
+            else {
+                document.getElementById("myLogo").style.display = "block";
+            }
+        </script>
+    </div>   
+    @RenderSection("scripts", required: false)
+</body>
+</html>

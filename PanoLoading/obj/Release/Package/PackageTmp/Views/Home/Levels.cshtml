@@ -1,0 +1,553 @@
+﻿@using PanoLoading.Models
+@model LevelViewModel
+@{
+
+}
+<h3>@ViewBag.Title</h3>
+<hr />
+<style type="text/css">
+    .btn:hover {
+        background-color: #112d5d;
+        color: white;
+    }
+
+
+    #projectUrl {
+        display: none;
+    }
+
+    #pdf-main-container {
+        width: 400px;
+        margin: 20px auto;
+    }
+
+    #pdf-loader {
+        display: none;
+        text-align: center;
+        color: #999999;
+        font-size: 13px;
+        line-height: 100px;
+        height: 100px;
+    }
+
+    #pdf-contents {
+        display: none;
+    }
+
+    #pdf-meta {
+        overflow: hidden;
+        margin: 0 0 20px 0;
+    }
+
+    #pdf-buttons {
+        float: left;
+    }
+
+    #page-count-container {
+        float: right;
+    }
+
+    #pdf-current-page {
+        display: inline;
+    }
+
+    #pdf-total-pages {
+        display: inline;
+    }
+
+    #pdf-canvas {
+        border: 1px solid rgba(0,0,0,0.2);
+        box-sizing: border-box;
+    }
+
+    #page-loader {
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        display: none;
+        color: #999999;
+        font-size: 13px;
+    }
+    #iframeLocation{
+         width: 600px;
+         max-width: 600px;
+    }
+    #errorhandler{
+        display:none;
+        color:red;
+    }
+    #selectedProject{
+        display:none;
+    }
+
+    .modalP {
+          display: none; 
+          position: fixed; 
+          z-index: 1;
+          padding-top: 100px; 
+          left: 0;
+          top: 0;
+          width: 100%; 
+          height: 100%; 
+          overflow: auto; 
+          background-color: rgb(0,0,0); 
+          background-color: rgba(0,0,0,0.4); 
+        }
+
+
+        .modalP-content {
+          position: relative;
+          background-color: #fefefe;
+          margin: auto;
+          padding: 0;
+          border: 1px solid #888;
+          width: 600px;
+          box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+          -webkit-animation-name: animatetop;
+          -webkit-animation-duration: 0.4s;
+          animation-name: animatetop;
+          animation-duration: 0.4s
+        }
+        @@-webkit-keyframes animatetop {
+          from {top:-300px; opacity:0} 
+          to {top:0; opacity:1}
+        }
+
+        @@keyframes animatetop {
+          from {top:-300px; opacity:0}
+          to {top:0; opacity:1}
+        }
+
+        .closeP {
+          color: white;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+        }
+
+        .closeP:hover,
+        .closeP:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .modalP-header {
+          padding: 2px 16px;
+          background-color: #616161!important;
+          color: white;
+        }
+        .modalP-body {padding: 2px 16px;}
+        .modalP-footer {
+          padding: 2px 16px;
+          background-color: #616161!important;
+          color: white;
+        }
+
+
+
+</style>
+
+<div id="selectedProject">@Model._Project.Id</div>
+
+@if (Model._Project.Plan.PlanAdded)
+{
+    <div id="projectUrl">@Model._Project.Plan.URLToDownload</div>
+}
+else
+{
+    <div id="projectUrl">None</div>
+}
+
+@if (Model.AppUser.Permission == 3 || Model.AppUser.Permission == 1)
+{
+    <div class="row">
+        <div class="col-md-9">
+            <div id="pdf-main-container">
+                <div id="pdf-loader">Loading document ...</div>
+                <div id="pdf-contents">
+                    <div id="pdf-meta">
+                        <div id="pdf-buttons">
+                            <button id="pdf-prev" class="btn btn-default btn-lg">Previous</button>
+                            <button id="pdf-next" class="btn btn-default btn-lg">Next</button>
+                        </div>
+                        <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div>
+                    </div>
+                    <canvas id="pdf-canvas" width="400"></canvas>
+                    <div id="page-loader">Loading page ...</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            @if (Model._Project.Plan.PlanAdded)
+            {
+                <a href="@Model._Project.Plan.URLToDownload" class="btn btn-default">Download Full Plan</a>
+            }
+        </div>
+    </div>
+}
+
+<h3>Levels</h3>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <table class="table">
+            <tbody>
+                @foreach (var item in Model.Levels)
+                        {
+                        <tr>
+                            @*<td>Level</td>*@
+                            <td>@item.Name</td>
+                            <td><a href="@item.ViewURL" class="btn btn-default btn-lg">View</a></td>
+                            <td>
+                                @if (Model.HasUser && Model.AppUser.Permission > 2)
+                                    {
+                                    <a href="@item.DeleteURL" class="btn btn-default btn-lg">Delete</a>
+                                    }
+                            </td>
+                            @if (Model.HasUser == true && Model.AppUser.Permission != 2)
+                                {
+                                <td>
+                                    <a href="" id="@item.Id" class="btn btn-default btn-lg">Upload Level Plan</a>
+                                </td>
+                                }
+                            @if ((item.PlanName.PlanAdded == true) && (Model.HasUser == true && Model.AppUser.Permission != 2))
+                                {
+                                <td>
+                                    <a href="@item.PlanName.URLToDownload" class="btn btn-default btn-lg">Download Level Plan</a>
+                                </td>
+                                }
+                        </tr>
+                        }
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+<h3>Entrance View</h3>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        @for (var i = 0; i < Model.EntranceUrls.Count; i++)
+                        {
+                            @Html.ActionLink("Viewer 3D Entrance Picture" + (i + 1), "EntranceViewer", new { item = Model.EntranceUrls[i] })
+                            <br />
+                            <br />
+                        }
+
+                    </td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+
+<h3>Tour</h3>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <table class="table">
+            <tbody>
+                    <tr>                        
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><a href="@Model._Project.Id" class="btn btn-default btn-lg">Add Tour</a></td>
+                        <td><a id="@Model.CustomerViewerUrl" href="@Model.CustomerViewerUrl" class="btn btn-default btn-lg">Customer Viewer</a></td>
+                    </tr>               
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+
+<h3>Images</h3>
+<div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-8">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><a href="@Model.AllImages" class="btn btn-default btn-lg">Download Room Images</a></td>
+                    <td></td>                    
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-2"></div>
+</div>
+
+ <div id="pModal" class="w3-modal">
+        <div class="w3-modal-content">
+            <header class="w3-container w3-dark-grey">
+                <span onclick="document.getElementById('pModal').style.display = 'none'"
+                        class="w3-button w3-display-topright">&times;</span>
+                <h2>Upload Level Plan</h2>
+            </header>
+            <div class="w3-container">
+                @using (Html.BeginForm("LevelPlanUploadFile", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+               {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <div class="col-md-10">
+                            @Html.TextBox("file", "", new { type = "file", @class = "form-control", accept = "application/pdf" }) <br />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10">
+                            <input type="submit" value="Submit Plan" class="btn btn-default" />
+                        </div>
+                    </div>
+                }
+            </div>
+            <footer class="w3-container w3-dark-grey">
+                <h1></h1>
+            </footer>
+    </div>
+</div>
+
+<div id="pModal1" class="w3-modal">
+    <div class="w3-modal-content">
+        <header class="w3-container w3-dark-grey">
+            <span onclick="document.getElementById('pModal1').style.display = 'none'"
+                  class="w3-button w3-display-topright">&times;</span>
+            <h2>Add Tour</h2>
+        </header>
+        <div class="w3-container"> 
+            <div>
+                <label for="Link"><b>Iframe URL:</b></label>
+                <input id="iframeLocation" type="text" placeholder="Enter Iframe URL" name="Link" required>
+                <a href="@Model._Project.Id" class="btn btn-default btn-lg">Add URL</a>
+            </div> 
+            <div>
+                <h3 id="errorhandler">No URL Entered</h3>
+            </div>        
+        </div>
+        <footer class="w3-container w3-dark-grey">
+            <h1></h1>
+        </footer>
+    </div>
+</div>
+
+
+<div id="myModalP" class="modalP">
+    <div class="modalP-content">
+        <div class="modalP-header">            
+            <h2>Download Progress</h2>
+        </div>
+        <div class="modalP-body">
+            <h3>Please Wait. Download will begin in a minute.....!</h3>            
+        </div>
+        <div class="modalP-footer">            
+        </div>
+    </div>
+</div>
+
+
+
+
+    <div>
+        @Html.ActionLink("Back", "DecisionList", "Home")
+    </div>
+
+
+    <script>
+        function AddLevel() {
+            var e = document.getElementById("addLevelText");
+            var name = e.options[e.selectedIndex].value;
+            $.getJSON("../AddLevel", { level: name }, function (data) {
+                location.reload();
+            });
+        }
+
+        function ShowModalP() {
+            var modal = document.getElementById("myModalP");          
+            modal.style.display = "block"; 
+           
+        }
+
+        function HideModalP() {
+            var modal = document.getElementById("myModalP");
+             modal.style.display = "none";            
+        }
+
+        $('a').click(function (e) {
+            var id = e.currentTarget.id;
+            var value = e.currentTarget.innerText;
+            if (value.trim() == "Upload Level Plan") {
+                e.preventDefault();
+                $.getJSON("../UpdateSelectedLevel", { level: id }, function (data) {
+                    document.getElementById('pModal').style.display = 'block';
+                });
+            }
+            else if (value.trim() == "Add Tour") {
+                e.preventDefault();
+                document.getElementById('pModal1').style.display = 'block';
+                //$.getJSON("../UpdateSelectedLevel", { level: id }, function (data) {
+                //});
+            }
+            else if (value.trim() == "Add URL") {
+                e.preventDefault();
+                var iframe = document.getElementById('iframeLocation').value;
+                if (iframe.trim().length == 0) {                    
+                    document.getElementById('errorhandler').style.display = 'block';
+                    return;
+                }
+                if (iframe.trim().indexOf("plushglobalmedia.com") == -1) {
+                    document.getElementById('errorhandler').style.display = 'block';
+                    return;
+                }              
+               
+                var id3 = parseInt(document.getElementById('selectedProject').innerText);
+                $.post("../AddTour", { projectId: id3, src: iframe.trim() }, function (data) {
+                    document.getElementById('errorhandler').style.display = 'none';
+                    document.getElementById('pModal1').style.display = 'none';
+                    document.getElementById('iframeLocation').value = "";
+                    location.reload();
+                });                
+            }
+            else if (value.trim() == "Download Room Images") {
+                e.preventDefault();
+                ShowModalP();                
+                var id3 = parseInt(document.getElementById('selectedProject').innerText)
+                var url = '../GetPhotos?projectId=' + id3;
+                var filename =  "bundle" + id3 + ".zip";;
+                var request = new XMLHttpRequest();
+                request.open('GET', url, true);
+                request.responseType = 'blob';
+                request.onload = function () {
+                    var link = document.createElement('a');
+                    link.id = "toDownload";
+                    document.body.appendChild(link);
+                    link.href = window.URL.createObjectURL(request.response);
+                    link.download = filename;
+                    link.click();
+                    $.getJSON("../GetPhotosDeleteFile", { projectId: id3 }, function (data2) {
+                        //document.getElementById("toDownload").remove();
+                        HideModalP();
+                     });
+                };
+                request.send();
+            }
+            else if (value.trim() == "Customer Viewer") {
+                var id = e.currentTarget.id;
+                if (id.trim() == "") {
+                    alert("Tour is not yet available");
+                    e.preventDefault();                    
+                }                
+            }
+        });        
+    </script>
+
+    <script>
+
+        var __PDF_DOC,
+            __CURRENT_PAGE,
+            __TOTAL_PAGES,
+            __PAGE_RENDERING_IN_PROGRESS = 0,
+            __CANVAS = $('#pdf-canvas').get(0),
+            __CANVAS_CTX = __CANVAS.getContext('2d');
+
+        function showPDF(pdf_url) {
+            $("#pdf-loader").show();
+            PDFJS.getDocument({ url: pdf_url }).then(function (pdf_doc) {
+                __PDF_DOC = pdf_doc;
+                __TOTAL_PAGES = __PDF_DOC.numPages;
+
+                // Hide the pdf loader and show pdf container in HTML
+                $("#pdf-loader").hide();
+                $("#pdf-contents").show();
+                $("#pdf-total-pages").text(__TOTAL_PAGES);
+
+                // Show the first page
+                showPage(1);
+            }).catch(function (error) {
+                // If error re-show the upload button
+                $("#pdf-loader").hide();
+                $("#upload-button").show();
+
+                alert(error.message);
+            });;
+        }
+
+        function showPage(page_no) {
+            __PAGE_RENDERING_IN_PROGRESS = 1;
+            __CURRENT_PAGE = page_no;
+
+            // Disable Prev & Next buttons while page is being loaded
+            $("#pdf-next, #pdf-prev").attr('disabled', 'disabled');
+
+            // While page is being rendered hide the canvas and show a loading message
+            $("#pdf-canvas").hide();
+            $("#page-loader").show();
+
+            // Update current page in HTML
+            $("#pdf-current-page").text(page_no);
+
+            // Fetch the page
+            __PDF_DOC.getPage(page_no).then(function (page) {
+                // As the canvas is of a fixed width we need to set the scale of the viewport accordingly
+                var scale_required = __CANVAS.width / page.getViewport(1).width;
+
+                // Get viewport of the page at required scale
+                var viewport = page.getViewport(scale_required);
+
+                // Set canvas height
+                __CANVAS.height = viewport.height;
+
+                var renderContext = {
+                    canvasContext: __CANVAS_CTX,
+                    viewport: viewport
+                };
+
+                // Render the page contents in the canvas
+                page.render(renderContext).then(function () {
+                    __PAGE_RENDERING_IN_PROGRESS = 0;
+
+                    // Re-enable Prev & Next buttons
+                    $("#pdf-next, #pdf-prev").removeAttr('disabled');
+
+                    // Show the canvas and hide the page loader
+                    $("#pdf-canvas").show();
+                    $("#page-loader").hide();
+                });
+            });
+        }
+
+        var url = document.getElementById("projectUrl").innerText.trim();
+        if (url != "None") {
+            showPDF(url);
+        }
+
+
+        // Previous page of the PDF
+        $("#pdf-prev").on('click', function () {
+            if (__CURRENT_PAGE != 1)
+                showPage(--__CURRENT_PAGE);
+        });
+
+        // Next page of the PDF
+        $("#pdf-next").on('click', function () {
+            if (__CURRENT_PAGE != __TOTAL_PAGES)
+                showPage(++__CURRENT_PAGE);
+        });
+
+    </script>
+
