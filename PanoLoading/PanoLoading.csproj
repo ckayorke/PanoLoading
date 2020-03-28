@@ -476,6 +476,9 @@
     <Content Include="Scripts\_references.js" />
     <Content Include="UploadedPictureFiles\backup.jpg" />
     <Content Include="UploadedPictureFiles\backup1.png" />
+    <Content Include="UploadedPictureFiles\screenpic2_.jpg" />
+    <Content Include="UploadedPictureFiles\screenpic1A2_.jpg" />
+    <Content Include="UploadedPictureFiles\screenpic1A_.jpg" />
     <Content Include="UploadedPictureFiles\NVMS.png" />
     <Content Include="UploadedPictureFiles\backup2.jpg" />
     <Content Include="UploadedPictureFiles\screenpic0A.jpg" />
@@ -487,6 +490,11 @@
     <Content Include="UploadedPictureFiles\screenpic3B.png" />
     <Content Include="UploadedPictureFiles\screenpic4A.jpg" />
     <Content Include="UploadedPictureFiles\screenpic4B.png" />
+    <Content Include="UploadedPictureFiles\screenpic0B_.jpg" />
+    <Content Include="UploadedPictureFiles\screenpic0A_.jpg" />
+    <Content Include="UploadedPictureFiles\screenpic4A_.jpg" />
+    <Content Include="UploadedPictureFiles\screenpic4B_.jpg" />
+    <Content Include="UploadedPictureFiles\screenpic1A3_.jpg" />
     <Content Include="UploadedPlanFiles\backup.jpg" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -546,6 +554,7 @@
     <Content Include="Views\Home\EntranceViewer.cshtml" />
     <Content Include="Views\Home\PrivacyPolicy.cshtml" />
     <Content Include="Views\Home\IOSSupport.cshtml" />
+    <Content Include="Views\Home\AndroidSupport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

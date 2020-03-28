@@ -185,6 +185,11 @@ namespace PanoLoading.Controllers
             return View();
         }
 
+        public ActionResult AndroidSupport()
+        {
+            return View();
+        }
+
         public ActionResult Decision()
         {
             var request = this.HttpContext.Request;
