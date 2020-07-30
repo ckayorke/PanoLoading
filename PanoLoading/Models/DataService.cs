@@ -441,5 +441,32 @@ namespace PanoLoading.Models
                 return db.Query<IRoomFrame>("Select * From RoomIFrame WHERE ProjectId = @ProjectId;", new { projectId }).ToList();
             }
         }
+
+        public static List<EmailNotification> ReadAllEmailNotification()
+        {
+            using (IDbConnection db = new SqlConnection(cs))
+            {
+                return db.Query<EmailNotification>("Select * From EmailNotification").ToList();
+            }
+        }
+
+        public static int AddEmailNotification(EmailNotification notifier)
+        {
+            using (IDbConnection db = new SqlConnection(cs))
+            {
+                if (notifier.Id == -1)
+                {
+                    string sqlQuery = "INSERT INTO EmailNotification(Email, Login) Values(@Email, @Login);";
+                    int rowsAffected = db.Execute(sqlQuery, notifier);
+                    return rowsAffected;
+                }
+                else
+                {
+                    string sqlQuery = "UPDATE EmailNotification SET Email = @Email, Login = @Login WHERE Id = @Id;";
+                    int rowsAffected = db.Execute(sqlQuery, notifier);
+                    return rowsAffected;
+                }
+            }
+        }
     }
 }

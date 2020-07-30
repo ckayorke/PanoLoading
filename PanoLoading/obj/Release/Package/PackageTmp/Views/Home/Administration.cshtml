@@ -2,9 +2,10 @@
 @{
     ViewBag.Title = "About";    
 }
+<h3>Users</h3>
 <hr />
 <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-3">        
     </div>  
     <div class="col-md-6">
         <table class="table">
@@ -38,6 +39,65 @@
     <div class="col-md-3">        
     </div>   
 </div>
+<hr />
+ <h3>Change Email Notifier</h3>
+<hr />
+<div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Email" class="col-md-4 control-label"><b>Gmail Address</b></label>                   
+            <div class="col-md-8">                       
+                <input type="Email"  class="form-control" placeholder="Enter Gmail Account" name="Email"  id="Email" required>                      
+            </div>
+        </div>
+        <br />
+        <br />
+        <div class="form-group">
+            <label for="Password" class="col-md-4 control-label"><b>Password</b></label>
+            <div class="col-md-8">
+                <input type="Password" class="form-control" placeholder="Enter Password" name="Password" id="Password" required>
+            </div>
+        </div>
+        <br />
+        <br /> 
+        <div class="form-group">
+            <label for="Send" class="col-md-4 control-label"><b></b></label>
+            <div class="col-md-8">
+                <a href="" class="btn btn-default">Send</a>
+            </div>
+        </div>         
+    </div>
+    <div class="col-md-3">
+    </div>
+</div>
 <div>
     @Html.ActionLink("Back", "Decision", "Home")
 </div>
+<script>
+    $('a').click(function (e) {
+        var value = e.currentTarget.innerText;
+        if (value.trim() == "Send") {
+            e.preventDefault();
+            var mail = document.getElementById("Email").value.trim();
+            var pass = document.getElementById("Password").value.trim();
+            if((mail.length == 0) || (pass.length == 0) || (mail.includes("gmail.com") == false)){
+                alert("Invalid Input!!");
+                return;
+            }
+            var url = window.location.href;
+            var urls = url.split("Home");
+            var url2 = urls[0] + "Home/UpdateEmailNotifier";
+            $.getJSON(url2, { email: mail, password: pass }, function (data) {
+                if (data == "Good") {
+                    alert("Email Notifier updated");
+                }
+                else {
+                    alert("Error Updating Email Notifier");
+                }
+                location.reload();
+            });
+        }  
+    });
+</script>

@@ -215,6 +215,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\EmailNotification.cs" />
     <Compile Include="Models\AppUser.cs" />
     <Compile Include="Models\DataService.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -555,6 +556,7 @@
     <Content Include="Views\Home\PrivacyPolicy.cshtml" />
     <Content Include="Views\Home\IOSSupport.cshtml" />
     <Content Include="Views\Home\AndroidSupport.cshtml" />
+    <Content Include="Views\Home\EditUserError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

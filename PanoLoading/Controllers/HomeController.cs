@@ -19,6 +19,7 @@ using System.Web.Mvc;
 using System.Web.Script.Serialization;
 using System.Net.Mail;
 using Microsoft.AspNet.Identity;
+using System.Security.Cryptography;
 
 namespace PanoLoading.Controllers
 {
@@ -132,6 +133,27 @@ namespace PanoLoading.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
+            try
+            {
+                var log = DataService.ReadAllEmailNotification();
+                if (log.Count==0)
+                {
+                    return RedirectToAction("EditUserError/1", "Home");
+                }
+                if (log.Count > 0)
+                {
+                    if(Decrypt(log[0].Login) == "")
+                    {
+                        return RedirectToAction("EditUserError/2", "Home");
+                    }
+                }
+ 
+            }
+            catch(Exception tx)
+            {               
+                return RedirectToAction("EditUserError/0", "Home");
+            }
+
             List<AppUser> users = DataService.ReadAllUsers();
             AppUser user2 = users.Where(x => x.Name.Trim().ToUpper() == User.Identity.Name.Trim().ToUpper()).SingleOrDefault<AppUser>();
             if (user2 == null || user2.Permission != 3)
@@ -140,8 +162,45 @@ namespace PanoLoading.Controllers
             }
             user.Permission = Convert.ToInt32(user.PermissionName);
             DataService.UpdateAppUser(user);
-            //SendAsync(user.Name);
+            try
+            {
+                SendAsync(user.Name);
+            }
+            catch (Exception tx)
+            {
+                return RedirectToAction("EditUserError/3", "Home");
+            }
             return RedirectToAction("Administration", "Home");
+        }
+
+        public ActionResult EditUserError(int id =4)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Login", "Account");
+            }  
+            if(id== 0)
+            {
+                ViewBag.Message = "Email notification table does not exist.";
+            }
+            else if (id == 1)
+            {
+                ViewBag.Message = "Email notification table is empty.";
+            }
+            else if (id == 2)
+            {
+                ViewBag.Message = "Password Decryption Error.";
+            }
+            else if (id == 3)
+            {
+                ViewBag.Message = "Email Authentication Errror.";
+            }
+            else
+            {
+                ViewBag.Message = "Unknown Email Notification Error.";
+            }
+
+            return View();
         }
         public ActionResult Administration()
         {
@@ -2535,7 +2594,8 @@ namespace PanoLoading.Controllers
             FileInfo[] Files = d.GetFiles();
             foreach (FileInfo item in Files)
             {
-                if (item.Name.Contains("Project")){
+                var name = item.Name.Trim().ToLower();
+                if (name.Contains("project")){
                     var parts = item.Name.Split('_');
                     int result = Int32.Parse(parts[1]);
                     if (list.Contains(result))
@@ -2546,7 +2606,7 @@ namespace PanoLoading.Controllers
                         DeleteFiles(Path.Combine(HostingEnvironment.MapPath("~/UploadedPictureFiles"), item.Name));
                     }
                 }
-                else if (item.Name.Contains("_Out_"))
+                else if (name.Contains("_out_"))
                 {
                     var parts = item.Name.Split('_');
                     int result = Int32.Parse(parts[1]);
@@ -2559,7 +2619,7 @@ namespace PanoLoading.Controllers
                     }
                 }
 
-                else if (item.Name.Contains("_Pro_"))
+                else if (name.Contains("_pro_"))
                 {
                     var parts = item.Name.Split('_');
                     int result = Int32.Parse(parts[2]);
@@ -2572,7 +2632,7 @@ namespace PanoLoading.Controllers
                     }
                 }
 
-                else if (item.Name.Contains("Pro_"))
+                else if (name.Contains("pro_"))
                 {
                     var parts = item.Name.Split('_');
                     int result = Int32.Parse(parts[1]);
@@ -2604,7 +2664,7 @@ namespace PanoLoading.Controllers
                 name = name.Trim().ToLower();
                 if (name.Contains(".jpg") || name.ToLower().Contains(".jpeg"))
                 {
-                    if (item.Name.Contains("Project_") || item.Name.StartsWith("_Pro_"))
+                    if (name.Contains("project_") || item.Name.StartsWith("_pro_"))
                     {
                         var parts = item.Name.Split('_');
                         int proId = Int32.Parse(parts[1]);
@@ -2678,11 +2738,11 @@ namespace PanoLoading.Controllers
             FileInfo[] Files = d.GetFiles();
             foreach (FileInfo item in Files)
             {
-                string name = item.Name.Trim();
-                string a = "_Pro_"+ id + "_3D";
-                string b = "Pro_" + id + "_";
-                string c = "Project_" + id + "_Level";
-                string f = "Proj_" + id + "_Out_";
+                string name = item.Name.Trim().ToLower();
+                string a = "_pro_"+ id + "_3d";
+                string b = "pro_" + id + "_";
+                string c = "project_" + id + "_level";
+                string f = "proj_" + id + "_out_";
                 if (name.Contains(a) || name.Contains(b) || name.Contains(c) || name.Contains(f)) { 
                    DeleteFiles(Path.Combine(HostingEnvironment.MapPath("~/UploadedPictureFiles"), item.Name));   
                 }                
@@ -2695,22 +2755,90 @@ namespace PanoLoading.Controllers
             {
                 return;
             }
-            IdentityMessage message = new IdentityMessage();
-            message.Body = "Hi,\nYou have been approved by NVMS to use our AllView360 App.\nThanks";
-            message.Destination = email;
-            message.Subject = "Approval Notice";
-            var from = "NVMS10371@gmail.com";
-            var pass = "Smvn10371!";
-            SmtpClient client = new SmtpClient("smtp.gmail.com", 465);
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.UseDefaultCredentials = false;
-            client.Credentials = new System.Net.NetworkCredential(from, pass);
-            client.EnableSsl = true;
-            var mail = new MailMessage(from, message.Destination);
-            mail.Subject = message.Subject;
-            mail.Body = message.Body;
-            mail.IsBodyHtml = true;
-            client.SendMailAsync(mail).Wait();
+
+            var loginInfo = DataService.ReadAllEmailNotification();
+            var notifierEmail = loginInfo[0].Email.Trim();
+            string fromPassword = Decrypt(loginInfo[0].Login.Trim());
+            var fromAddress = new MailAddress(notifierEmail, "NVMS");
+            var toAddress = new MailAddress(email, email);
+            string subject = "Approval Notice";
+            string body = "Hi,\nYou have been approved by NVMS to use our AllView360 App.\nThanks";
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587
+            };
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = new NetworkCredential(fromAddress.Address, fromPassword);
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtp.EnableSsl = true;
+            smtp.Timeout = 20000;
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            })
+            {
+                smtp.Send(message);
+            }
+        }
+
+        public string Crypt(string text)
+        {
+            byte[] key = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            byte[] iv = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            SymmetricAlgorithm algorithm = DES.Create();
+            ICryptoTransform transform = algorithm.CreateEncryptor(key, iv);   
+            byte[] inputbuffer = Encoding.Unicode.GetBytes(text);
+            byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
+            return Convert.ToBase64String(outputBuffer);
+           
+        }
+        public  string Decrypt(string text)
+        {
+            try
+            {
+                byte[] key = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
+                byte[] iv = new byte[8] { 1, 2, 3, 4, 5, 6, 7, 8 };
+                SymmetricAlgorithm algorithm = DES.Create();
+                ICryptoTransform transform = algorithm.CreateDecryptor(key, iv);
+                byte[] inputbuffer = Convert.FromBase64String(text);
+                byte[] outputBuffer = transform.TransformFinalBlock(inputbuffer, 0, inputbuffer.Length);
+                return Encoding.Unicode.GetString(outputBuffer);
+            }
+            catch(Exception ex)
+            {
+                return "UnableToDecrypt";
+            }
+        }
+
+        [AcceptVerbs(HttpVerbs.Get)]
+        public JsonResult UpdateEmailNotifier(string email, string password)
+        {
+            string pass = Crypt(password);
+            var loginInfo = DataService.ReadAllEmailNotification();
+            var notifier = new EmailNotification();
+            if (loginInfo.Count == 0)
+            {                
+                notifier.Id = -1;
+                notifier.Email = email;
+                notifier.Login = pass;
+            }
+            else
+            {
+                notifier = loginInfo[0];
+                notifier.Email = email;
+                notifier.Login = pass;
+            }
+            try
+            {
+                DataService.AddEmailNotification(notifier);
+            }
+            catch(Exception tx)
+            {
+                return Json("Bad", JsonRequestBehavior.AllowGet);
+            }           
+            return Json("Good", JsonRequestBehavior.AllowGet);
         }
     }
 }
